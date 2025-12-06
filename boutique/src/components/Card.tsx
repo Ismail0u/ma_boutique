@@ -52,7 +52,7 @@ export const Card: React.FC<CardProps> = ({
 // CardHeader
 interface CardHeaderProps {
   title: string;
-  subtitle?: string;
+  subtitle?: React.ReactNode;
   action?: React.ReactNode;
   className?: string;
 }

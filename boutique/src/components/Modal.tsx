@@ -74,12 +74,12 @@ export const Modal: React.FC<ModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
+      className="fixed inset-0 z-60 flex items-center justify-center bg-black bg-opacity-50 p-4 pb-20"
       onClick={handleBackdropClick}
     >
       <div
         ref={modalRef}
-        className={`bg-white rounded-lg shadow-xl w-full ${sizeClasses[size]} max-h-[90vh] overflow-hidden flex flex-col animate-fadeIn`}
+        className={`bg-white rounded-lg shadow-xl w-full ${sizeClasses[size]} max-h-[85vh] overflow-hidden flex flex-col animate-fadeIn`}
       >
         {/* Header */}
         {(title || showCloseButton) && (
@@ -117,7 +117,7 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
   className = ''
 }) => {
   return (
-    <div className={`flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50 ${className}`}>
+    <div className={`flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50 shrink-0 ${className}`}>
       {children}
     </div>
   );

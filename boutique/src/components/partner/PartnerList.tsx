@@ -11,7 +11,6 @@ import type { Partner } from '../../types/partners';
 import { usePartnerBalance } from '../../hooks/useTransactions';
 import { Card } from '../Card';
 import { Badge } from '../Badge';
-import { Button } from '../Buttons';
 import { EmptyState } from '../EmptyState';
 import { ListSkeleton } from '../Loading';
 import { Input } from '../Input';
@@ -96,41 +95,39 @@ const PartnerListItem: React.FC<{
       onClick={onClick}
       className="cursor-pointer"
     >
-      <div className="flex items-center justify-between gap-4">
-        {/* Info principale */}
-        <div className="flex items-center gap-3 flex-1 min-w-0">
-          {/* Avatar */}
-          <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-            <User size={20} className="text-blue-600" />
-          </div>
+      <div className="flex items-start gap-3">
+        {/* Avatar */}
+        <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+          <User size={24} className="text-blue-600" />
+        </div>
 
-          {/* Nom et détails */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <h3 className="font-semibold text-gray-900 truncate">
+        {/* Info principale - Layout vertical pour mobile */}
+        <div className="flex-1 min-w-0">
+          {/* Nom et badge */}
+          <div className="flex items-start justify-between gap-2 mb-2">
+            <div className="flex-1 min-w-0">
+              <h3 className="font-bold text-gray-900 text-lg mb-1 break-words">
                 {partner.name}
               </h3>
               <Badge variant={getTypeBadgeVariant(partner.type)} size="sm">
                 {getTypeLabel(partner.type)}
               </Badge>
             </div>
-
-            {partner.phone && (
-              <div className="flex items-center gap-1 text-sm text-gray-600">
-                <Phone size={14} />
-                <span>{partner.phone}</span>
-              </div>
-            )}
+            <ChevronRight size={20} className="text-gray-400 flex-shrink-0 mt-1" />
           </div>
-        </div>
 
-        {/* Balance et action */}
-        <div className="flex items-center gap-3">
-          <div className="text-right">
+          {/* Téléphone */}
+          {partner.phone && (
+            <div className="flex items-center gap-1 text-sm text-gray-600 mb-2">
+              <Phone size={14} />
+              <span>{partner.phone}</span>
+            </div>
+          )}
+
+          {/* Balance - Pleine largeur */}
+          <div className="mt-3 pt-3 border-t border-gray-100">
             {getBalanceDisplay()}
           </div>
-          
-          <ChevronRight size={20} className="text-gray-400" />
         </div>
       </div>
     </Card>

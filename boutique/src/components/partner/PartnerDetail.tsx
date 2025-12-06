@@ -16,6 +16,7 @@ import { Button } from '../Buttons';
 import { Modal, ModalFooter } from '../Modal';
 import { Alert } from '../Alert';
 import { Spinner } from '../Loading';
+import { useNavigate } from "react-router-dom";
 import { 
   User, 
   Phone, 
@@ -44,6 +45,8 @@ export const PartnerDetail: React.FC<PartnerDetailProps> = ({
   const { balance, loading: balanceLoading } = usePartnerBalance(partner.id);
   const { transactions, loading: txLoading } = useTransactions({ partnerId: partner.id });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const navigate = useNavigate();
+
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('fr-FR', {
@@ -184,6 +187,14 @@ export const PartnerDetail: React.FC<PartnerDetailProps> = ({
               </div>
             )}
           </CardContent>
+        </Card>
+        <Card>
+            <CardContent>
+              {/* Dans PartnerDetail, bouton "Paiement"*/ }
+              <Button onClick={() => navigate(`/payments/new?partnerId=${partner.id}`)}>
+                Nouveau paiement
+              </Button>
+            </CardContent>
         </Card>
 
         {/* Historique transactions */}

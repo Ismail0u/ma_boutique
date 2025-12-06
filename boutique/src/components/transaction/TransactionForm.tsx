@@ -9,16 +9,14 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import type { Transaction, TransactionItem, Direction } from '../../types/transaction';
-import { useTransactions } from '../../hooks/useTransactions';
+import type { TransactionItem, Transaction, Direction } from '../../types/transaction';
+import { useTransactions, usePartnerBalance } from '../../hooks/useTransactions';
 import { usePartners } from '../../hooks/usePartner';
-import { usePartnerBalance } from '../../hooks/useTransactions';
 import { useOCRUpload } from '../../hooks/useOCRUpload';
-import { Input, Select , Textarea } from '../Input';
+import { Input, Select, Textarea } from '../Input';
 import { Button } from '../Buttons';
 import { Alert } from '../Alert';
 import { Card, CardHeader, CardContent } from '../Card';
-import { Badge } from '../Badge';
 import { ImageUpload } from './ImageUpload';
 import { ItemsEditor } from './ItemsEditor';
 import { 
@@ -383,29 +381,79 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
         />
       </div>
 
-      {/* Total & Paid */}
+      {/* Total & Paid - Style monétaire */}
       <div className="grid grid-cols-2 gap-4">
-        <Input
-          type="number"
-          label="Total *"
-          value={formData.total}
-          onChange={(e) => handleChange('total', Number(e.target.value))}
-          min="0"
-          error={errors.total}
-          disabled={!canEdit || isSubmitting || formData.items.length > 0}
-          helperText={formData.items.length > 0 ? 'Calculé depuis les articles' : undefined}
-        />
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Total *
+          </label>
+          <div className="relative">
+            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-semibold text-sm">
+              F CFA
+            </div>
+            <input
+              type="number"
+              value={formData.total || ''}
+              onFocus={(e) => {
+                if (e.target.value === '0') e.target.value = '';
+              }}
+              onChange={(e) => handleChange('total', Number(e.target.value))}
+              min="0"
+              disabled={!canEdit || isSubmitting || formData.items.length > 0}
+              className={`
+                w-full pl-20 pr-4 py-2 border rounded-lg transition-colors duration-200 
+                focus:outline-none focus:ring-2 font-mono text-base font-bold
+                ${errors.total 
+                  ? 'border-red-500 focus:ring-red-500 focus:border-red-500' 
+                  : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                }
+                ${(!canEdit || isSubmitting || formData.items.length > 0) ? 'bg-gray-100' : ''}
+              `}
+              placeholder="0"
+            />
+          </div>
+          {errors.total && (
+            <p className="mt-1 text-sm text-red-600">{errors.total}</p>
+          )}
+          {formData.items.length > 0 && (
+            <p className="mt-1 text-xs text-gray-500">Calculé depuis les articles</p>
+          )}
+        </div>
 
-        <Input
-          type="number"
-          label="Montant payé *"
-          value={formData.paid}
-          onChange={(e) => handleChange('paid', Number(e.target.value))}
-          min="0"
-          max={formData.total}
-          error={errors.paid}
-          disabled={!canEdit || isSubmitting}
-        />
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Montant payé *
+          </label>
+          <div className="relative">
+            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-semibold text-sm">
+              F CFA
+            </div>
+            <input
+              type="number"
+              value={formData.paid || ''}
+              onFocus={(e) => {
+                if (e.target.value === '0') e.target.value = '';
+              }}
+              onChange={(e) => handleChange('paid', Number(e.target.value))}
+              min="0"
+              max={formData.total}
+              disabled={!canEdit || isSubmitting}
+              className={`
+                w-full pl-20 pr-4 py-2 border rounded-lg transition-colors duration-200 
+                focus:outline-none focus:ring-2 font-mono text-base font-bold
+                ${errors.paid 
+                  ? 'border-red-500 focus:ring-red-500 focus:border-red-500' 
+                  : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                }
+                ${(!canEdit || isSubmitting) ? 'bg-gray-100' : ''}
+              `}
+              placeholder="0"
+            />
+          </div>
+          {errors.paid && (
+            <p className="mt-1 text-sm text-red-600">{errors.paid}</p>
+          )}
+        </div>
       </div>
 
       {/* Note */}
