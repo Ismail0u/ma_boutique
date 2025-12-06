@@ -16,13 +16,12 @@ import { useOCRUpload } from '../../hooks/useOCRUpload';
 import { Input, Select, Textarea } from '../Input';
 import { Button } from '../Buttons';
 import { Alert } from '../Alert';
-import { Card, CardHeader, CardContent } from '../Card';
+import { Card } from '../Card';
 import { ImageUpload } from './ImageUpload';
 import { ItemsEditor } from './ItemsEditor';
 import { 
   TrendingUp, 
   TrendingDown, 
-  AlertCircle,
   Lock,
   Save,
   Eye

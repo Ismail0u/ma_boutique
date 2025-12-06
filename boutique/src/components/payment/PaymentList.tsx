@@ -94,7 +94,6 @@ export const PaymentList: React.FC<PaymentListProps> = ({
                     variant="info" 
                     size="sm"
                     className="cursor-pointer"
-                    onClick={() => onViewTransaction?.(payment.transactionId!)}
                   >
                     <Receipt size={12} className="inline mr-1" />
                     Transaction #{payment.transactionId}

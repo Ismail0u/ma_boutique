@@ -97,7 +97,7 @@ const PartnerListItem: React.FC<{
     >
       <div className="flex items-start gap-3">
         {/* Avatar */}
-        <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+        <div className="shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
           <User size={24} className="text-blue-600" />
         </div>
 
@@ -106,14 +106,14 @@ const PartnerListItem: React.FC<{
           {/* Nom et badge */}
           <div className="flex items-start justify-between gap-2 mb-2">
             <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-gray-900 text-lg mb-1 break-words">
+              <h3 className="font-bold text-gray-900 text-lg mb-1 wrap-break-words">
                 {partner.name}
               </h3>
               <Badge variant={getTypeBadgeVariant(partner.type)} size="sm">
                 {getTypeLabel(partner.type)}
               </Badge>
             </div>
-            <ChevronRight size={20} className="text-gray-400 flex-shrink-0 mt-1" />
+            <ChevronRight size={20} className="text-gray-400 flex shrink-0 mt-1" />
           </div>
 
           {/* Téléphone */}

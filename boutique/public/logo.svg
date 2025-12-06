@@ -1,0 +1,42 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" rx="80" fill="#2563eb"/>
+  
+  <!-- Book/Ledger icon -->
+  <g transform="translate(100, 100)">
+    <!-- Book pages -->
+    <rect x="50" y="40" width="250" height="280" rx="8" fill="#ffffff"/>
+    <rect x="60" y="50" width="230" height="260" rx="4" fill="#eff6ff"/>
+    
+    <!-- Lines representing ledger entries -->
+    <line x1="80" y1="100" x2="270" y2="100" stroke="#2563eb" stroke-width="4" stroke-linecap="round"/>
+    <line x1="80" y1="140" x2="270" y2="140" stroke="#2563eb" stroke-width="4" stroke-linecap="round"/>
+    <line x1="80" y1="180" x2="230" y2="180" stroke="#2563eb" stroke-width="4" stroke-linecap="round"/>
+    <line x1="80" y1="220" x2="270" y2="220" stroke="#2563eb" stroke-width="4" stroke-linecap="round"/>
+    <line x1="80" y1="260" x2="200" y2="260" stroke="#2563eb" stroke-width="4" stroke-linecap="round"/>
+    
+    <!-- Vertical divider (ledger column) -->
+    <line x1="190" y1="70" x2="190" y2="290" stroke="#60a5fa" stroke-width="2" stroke-dasharray="5,5"/>
+    
+    <!-- Book spine shadow -->
+    <rect x="50" y="40" width="20" height="280" rx="8" fill="#1e40af" opacity="0.3"/>
+    
+    <!-- Currency symbol (F for FCFA) -->
+    <text x="240" y="90" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#1e40af">F</text>
+  </g>
+  
+  <!-- Bottom accent - represents growth/chart -->
+  <path d="M 120 400 L 180 350 L 240 380 L 300 320 L 360 340 L 400 300" 
+        stroke="#60a5fa" 
+        stroke-width="6" 
+        fill="none" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"/>
+  
+  <circle cx="120" cy="400" r="8" fill="#60a5fa"/>
+  <circle cx="180" cy="350" r="8" fill="#60a5fa"/>
+  <circle cx="240" cy="380" r="8" fill="#60a5fa"/>
+  <circle cx="300" cy="320" r="8" fill="#60a5fa"/>
+  <circle cx="360" cy="340" r="8" fill="#60a5fa"/>
+  <circle cx="400" cy="300" r="8" fill="#60a5fa"/>
+</svg>

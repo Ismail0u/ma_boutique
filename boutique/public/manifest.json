@@ -1,0 +1,127 @@
+{
+  "name": "Ledger Pro - Gestion Commerciale",
+  "short_name": "Ledger Pro",
+  "description": "Application de gestion commerciale offline-first avec OCR",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "finance", "productivity"],
+  "screenshots": [
+    {
+      "src": "/screenshots/dashboard.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/screenshots/mobile.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "share_target": {
+    "action": "/transactions/new",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "files": [
+        {
+          "name": "image",
+          "accept": ["image/*"]
+        }
+      ]
+    }
+  },
+  "shortcuts": [
+    {
+      "name": "Nouvelle transaction",
+      "short_name": "Transaction",
+      "description": "Créer une nouvelle transaction",
+      "url": "/transactions/new",
+      "icons": [
+        {
+          "src": "/icons/shortcut-transaction.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Nouveau client",
+      "short_name": "Client",
+      "description": "Ajouter un nouveau client",
+      "url": "/clients",
+      "icons": [
+        {
+          "src": "/icons/shortcut-client.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Nouveau paiement",
+      "short_name": "Paiement",
+      "description": "Enregistrer un paiement",
+      "url": "/payments",
+      "icons": [
+        {
+          "src": "/icons/shortcut-payment.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}

@@ -160,7 +160,6 @@ export const TransactionPayments: React.FC<TransactionPaymentsProps> = ({
       >
         <PaymentForm
           defaultPartnerId={transaction.partnerId}
-          defaultTransactionId={transaction.id}
           onSuccess={handlePaymentSuccess}
           onCancel={() => setShowAddPayment(false)}
         />
