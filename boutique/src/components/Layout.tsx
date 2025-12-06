@@ -13,6 +13,7 @@ import {
   Users, 
   Truck, 
   Receipt,
+  DollarSign
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -32,7 +33,8 @@ export const Layout: React.FC<LayoutProps> = ({
     { path: '/', icon: LayoutDashboard, label: 'Tableau de bord' },
     { path: '/clients', icon: Users, label: 'Clients' },
     { path: '/fournisseurs', icon: Truck, label: 'Fournisseurs' },
-    { path: '/transactions', icon: Receipt, label: 'Transactions' }
+    { path: '/transactions', icon: Receipt, label: 'Transactions' },
+    { path: '/payments', icon: DollarSign, label: 'Paiements' }
   ];
 
   const isActive = (path: string) => {
@@ -65,7 +67,7 @@ export const Layout: React.FC<LayoutProps> = ({
 
       {/* Bottom Navigation (Mobile) */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
-        <div className="grid grid-cols-4 h-16">
+        <div className="grid grid-cols-5 h-20">
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.path);
@@ -82,7 +84,7 @@ export const Layout: React.FC<LayoutProps> = ({
                   }
                 `}
               >
-                <Icon size={24} />
+                <Icon size={22} />
                 <span className="text-xs font-medium">{item.label}</span>
               </Link>
             );

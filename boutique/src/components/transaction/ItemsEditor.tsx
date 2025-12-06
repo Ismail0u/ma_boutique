@@ -87,10 +87,20 @@ export const ItemsEditor: React.FC<ItemsEditorProps> = ({
         </Card>
       ) : (
         <div className="space-y-3">
+          {/* En-tête tableau (desktop) */}
+          <div className="hidden md:grid md:grid-cols-12 gap-3 px-3 py-2 bg-gray-100 rounded-lg font-semibold text-sm text-gray-700">
+            <div className="col-span-5">Article</div>
+            <div className="col-span-2 text-center">Qté</div>
+            <div className="col-span-2 text-right">Prix unit.</div>
+            <div className="col-span-2 text-right">Total</div>
+            <div className="col-span-1"></div>
+          </div>
+
+          {/* Lignes items */}
           {items.map((item, index) => (
-            <Card key={index} padding="sm" variant="bordered">
-              <div className="space-y-3">
-                {/* Nom de l'article */}
+            <div key={index} className="border border-gray-200 rounded-lg p-3">
+              {/* Vue mobile */}
+              <div className="md:hidden space-y-3">
                 <Input
                   placeholder="Nom de l'article"
                   value={item.name}
@@ -98,50 +108,96 @@ export const ItemsEditor: React.FC<ItemsEditorProps> = ({
                   disabled={disabled}
                   fullWidth
                 />
-
-                <div className="grid grid-cols-3 gap-3">
-                  {/* Quantité */}
+                <div className="grid grid-cols-3 gap-2">
                   <Input
                     type="number"
                     placeholder="Qté"
-                    value={item.qty}
+                    value={item.qty || ''}
+                    onFocus={(e) => e.target.value === '0' && (e.target.value = '')}
                     onChange={(e) => handleItemChange(index, 'qty', parseInt(e.target.value) || 0)}
                     min="1"
                     disabled={disabled}
                   />
-
-                  {/* Prix unitaire */}
                   <Input
                     type="number"
                     placeholder="Prix"
-                    value={item.price}
+                    value={item.price || ''}
+                    onFocus={(e) => e.target.value === '0' && (e.target.value = '')}
                     onChange={(e) => handleItemChange(index, 'price', parseInt(e.target.value) || 0)}
                     min="0"
                     disabled={disabled}
                   />
-
-                  {/* Total ligne + bouton supprimer */}
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 px-3 py-2 bg-gray-100 rounded-lg text-right font-semibold text-gray-900">
+                  <div className="flex items-center justify-end gap-2">
+                    <span className="text-sm font-bold text-gray-900">
                       {formatCurrency(calculateItemTotal(item))}
-                    </div>
+                    </span>
                     <button
                       type="button"
                       onClick={() => handleRemoveItem(index)}
                       disabled={disabled}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                      className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
                       aria-label="Supprimer"
                     >
-                      <Trash2 size={18} />
+                      <Trash2 size={16} />
                     </button>
                   </div>
                 </div>
               </div>
-            </Card>
+
+              {/* Vue desktop - tableau */}
+              <div className="hidden md:grid md:grid-cols-12 gap-3 items-center">
+                <div className="col-span-5">
+                  <Input
+                    placeholder="Nom de l'article"
+                    value={item.name}
+                    onChange={(e) => handleItemChange(index, 'name', e.target.value)}
+                    disabled={disabled}
+                  />
+                </div>
+                <div className="col-span-2">
+                  <Input
+                    type="number"
+                    placeholder="1"
+                    value={item.qty || ''}
+                    onFocus={(e) => e.target.value === '0' && (e.target.value = '')}
+                    onChange={(e) => handleItemChange(index, 'qty', parseInt(e.target.value) || 0)}
+                    min="1"
+                    disabled={disabled}
+                    className="text-center"
+                  />
+                </div>
+                <div className="col-span-2">
+                  <Input
+                    type="number"
+                    placeholder="0"
+                    value={item.price || ''}
+                    onFocus={(e) => e.target.value === '0' && (e.target.value = '')}
+                    onChange={(e) => handleItemChange(index, 'price', parseInt(e.target.value) || 0)}
+                    min="0"
+                    disabled={disabled}
+                    className="text-right font-mono"
+                  />
+                </div>
+                <div className="col-span-2 text-right font-mono font-bold text-gray-900">
+                  {formatCurrency(calculateItemTotal(item))}
+                </div>
+                <div className="col-span-1 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveItem(index)}
+                    disabled={disabled}
+                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                    aria-label="Supprimer"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+              </div>
+            </div>
           ))}
 
-          {/* Bouton ajouter + Total */}
-          <div className="flex items-center justify-between gap-4">
+          {/* Footer avec total */}
+          <div className="flex items-center justify-between gap-4 pt-3 border-t-2 border-gray-300">
             <Button
               type="button"
               variant="ghost"
@@ -154,8 +210,8 @@ export const ItemsEditor: React.FC<ItemsEditorProps> = ({
             </Button>
 
             <div className="text-right">
-              <p className="text-sm text-gray-600 mb-1">Total</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm text-gray-600 mb-1">Total général</p>
+              <p className="text-3xl font-bold text-gray-900 font-mono">
                 {formatCurrency(calculateGrandTotal())}
               </p>
             </div>
