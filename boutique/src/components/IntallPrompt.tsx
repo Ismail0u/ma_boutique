@@ -41,7 +41,7 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
                 size="sm"
                 onClick={onInstall}
                 leftIcon={<Download size={16} />}
-                className="bg-white text-blue-600 hover:bg-blue-50"
+                className="text-blue-600 bg-gray-200 hover:bg-blue-50"
               >
                 Installer
               </Button>
@@ -49,7 +49,7 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
                 size="sm"
                 variant="ghost"
                 onClick={onDismiss}
-                className="text-white hover:bg-white hover:bg-opacity-10"
+                className="text-white hover:bg-white hover:text-blue-600 hover:bg-opacity-10"
               >
                 Plus tard
               </Button>
