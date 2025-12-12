@@ -160,8 +160,8 @@ export function useDashboardAlerts() {
     }> = [];
 
     // Seuils configurables
-    const HIGH_DEBT_THRESHOLD = 100000; // 100k
-    const HIGH_CREDIT_THRESHOLD = 100000;
+    const HIGH_DEBT_THRESHOLD = 2000000; // 100k
+    const HIGH_CREDIT_THRESHOLD = 500000;
 
     balances.forEach(b => {
       // Alerte: client doit beaucoup

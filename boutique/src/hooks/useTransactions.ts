@@ -81,9 +81,9 @@ export function useTransactions(options: UseTransactionsOptions = {}): UseTransa
       if (txData.paid < 0) {
         throw new Error('Le montant payé ne peut pas être négatif');
       }
-      if (txData.paid > txData.total) {
-        throw new Error('Le montant payé ne peut pas dépasser le total');
-      }
+      //if (txData.paid > txData.total) {
+      //  throw new Error('Le montant payé ne peut pas dépasser le total');
+      //}
 
       // Calcul ancien solde
       const ancien = await getPreviousBalance(txData.partnerId, txData.date);

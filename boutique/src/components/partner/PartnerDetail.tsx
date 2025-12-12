@@ -17,8 +17,7 @@ import { Modal, ModalFooter } from '../Modal';
 import { Alert } from '../Alert';
 import { Spinner } from '../Loading';
 import { useNavigate } from "react-router-dom";
-import { 
-  User, 
+import {  
   Phone, 
   FileText,
   Edit,
@@ -26,7 +25,6 @@ import {
   TrendingUp,
   TrendingDown,
   Calendar,
-  DollarSign
 } from 'lucide-react';
 
 interface PartnerDetailProps {
@@ -188,7 +186,7 @@ export const PartnerDetail: React.FC<PartnerDetailProps> = ({
             )}
           </CardContent>
         </Card>
-        <Card>
+        <Card className='flex justify-center'>
             <CardContent>
               {/* Dans PartnerDetail, bouton "Paiement"*/ }
               <Button onClick={() => navigate(`/payments/new?partnerId=${partner.id}`)}>
