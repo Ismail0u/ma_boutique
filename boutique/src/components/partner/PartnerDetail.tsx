@@ -14,9 +14,9 @@ import { Card, CardHeader, CardContent } from '../Card';
 import { Badge } from '../Badge';
 import { Button } from '../Buttons';
 import { Modal, ModalFooter } from '../Modal';
+import { PaymentForm } from '../payment/PaymentForm';
 import { Alert } from '../Alert';
 import { Spinner } from '../Loading';
-import { useNavigate } from "react-router-dom";
 import { 
   User, 
   Phone, 
@@ -26,7 +26,8 @@ import {
   TrendingUp,
   TrendingDown,
   Calendar,
-  DollarSign
+  DollarSign,
+  Plus
 } from 'lucide-react';
 
 interface PartnerDetailProps {
@@ -45,8 +46,7 @@ export const PartnerDetail: React.FC<PartnerDetailProps> = ({
   const { balance, loading: balanceLoading } = usePartnerBalance(partner.id);
   const { transactions, loading: txLoading } = useTransactions({ partnerId: partner.id });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const navigate = useNavigate();
-
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('fr-FR', {
@@ -83,6 +83,12 @@ export const PartnerDetail: React.FC<PartnerDetailProps> = ({
   const handleDeleteConfirm = () => {
     onDelete?.();
     setShowDeleteConfirm(false);
+  };
+
+  const handlePaymentSuccess = () => {
+    setShowPaymentModal(false);
+    // Force refresh de la balance
+    window.location.reload();
   };
 
   return (
@@ -145,6 +151,20 @@ export const PartnerDetail: React.FC<PartnerDetailProps> = ({
                 <span>Créé le {formatDate(partner.createdAt)}</span>
               </div>
             </div>
+
+            {/* Bouton Nouveau Paiement */}
+            {balance !== 0 && (
+              <div className="mt-4 pt-4 border-t">
+                <Button
+                  fullWidth
+                  variant="success"
+                  leftIcon={<Plus size={18} />}
+                  onClick={() => setShowPaymentModal(true)}
+                >
+                  Enregistrer un paiement
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -187,14 +207,6 @@ export const PartnerDetail: React.FC<PartnerDetailProps> = ({
               </div>
             )}
           </CardContent>
-        </Card>
-        <Card>
-            <CardContent>
-              {/* Dans PartnerDetail, bouton "Paiement"*/ }
-              <Button onClick={() => navigate(`/payments/new?partnerId=${partner.id}`)}>
-                Nouveau paiement
-              </Button>
-            </CardContent>
         </Card>
 
         {/* Historique transactions */}
@@ -270,6 +282,20 @@ export const PartnerDetail: React.FC<PartnerDetailProps> = ({
             Supprimer
           </Button>
         </ModalFooter>
+      </Modal>
+
+      {/* Modal nouveau paiement */}
+      <Modal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        title="Nouveau paiement"
+        size="md"
+      >
+        <PaymentForm
+          defaultPartnerId={partner.id}
+          onSuccess={handlePaymentSuccess}
+          onCancel={() => setShowPaymentModal(false)}
+        />
       </Modal>
     </>
   );

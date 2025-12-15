@@ -50,7 +50,8 @@ interface FormData {
 export const TransactionForm: React.FC<TransactionFormProps> = ({
   transaction,
   defaultPartnerId,
-  defaultDirection = 'SALE',
+  defaultDirection =
+  'SALE',
   onSuccess,
   onCancel
 }) => {

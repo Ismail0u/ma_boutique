@@ -28,7 +28,6 @@ interface PaymentListProps {
   showPartnerName?: boolean;
   partnerNames?: Record<number, string>;
   onEditPayment?: (payment: Payment) => void;
-  onDeletePayment?: (payment: Payment) => void;
   onViewTransaction?: (transactionId: number) => void;
   emptyMessage?: string;
 }
@@ -39,7 +38,6 @@ export const PaymentList: React.FC<PaymentListProps> = ({
   showPartnerName = false,
   partnerNames = {},
   onEditPayment,
-  onDeletePayment,
   onViewTransaction,
   emptyMessage = 'Aucun paiement'
 }) => {
@@ -117,14 +115,14 @@ export const PaymentList: React.FC<PaymentListProps> = ({
               {/* Note */}
               {payment.note && (
                 <div className="flex items-start gap-1 text-sm text-gray-600 mt-2">
-                  <FileText size={14} className="mt-0.5 flex-shrink-0" />
+                  <FileText size={14} className="mt-0.5 flex shrink-0" />
                   <span className="line-clamp-2">{payment.note}</span>
                 </div>
               )}
             </div>
 
             {/* Actions */}
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 shrink-0">
               {onEditPayment && (
                 <Button
                   size="sm"
@@ -133,18 +131,6 @@ export const PaymentList: React.FC<PaymentListProps> = ({
                   leftIcon={<Edit size={14} />}
                 >
                   Éditer
-                </Button>
-              )}
-              
-              {onDeletePayment && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => onDeletePayment(payment)}
-                  leftIcon={<Trash2 size={14} />}
-                  className="text-red-600 hover:bg-red-50"
-                >
-                  Supprimer
                 </Button>
               )}
             </div>

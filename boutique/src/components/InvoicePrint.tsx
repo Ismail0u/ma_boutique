@@ -3,12 +3,12 @@
  * Format professionnel avec CSS print
  */
 
-import React, { useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import type { Transaction } from '../types/transaction';
 import type { Partner } from '../types/partners';
-
 import { Button } from './Buttons';
 import { Printer } from 'lucide-react';
+import { getPreviousBalance } from '../utils/balance';
 
 interface InvoicePrintProps {
   transaction: Transaction;
@@ -26,6 +26,12 @@ export const InvoicePrint: React.FC<InvoicePrintProps> = ({
   businessAddress
 }) => {
   const printRef = useRef<HTMLDivElement>(null);
+  const [ancienSolde, setAncienSolde] = useState<number>(0);
+
+  // Charger l'ancien solde
+  useEffect(() => {
+    getPreviousBalance(transaction.partnerId, transaction.date).then(setAncienSolde);
+  }, [transaction.partnerId, transaction.date]);
 
   const handlePrint = () => {
     window.print();
@@ -151,19 +157,30 @@ export const InvoicePrint: React.FC<InvoicePrintProps> = ({
 
           {/* Totaux */}
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '30px' }}>
-            <div style={{ width: '300px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderTop: '1px solid #ddd' }}>
-                <span><strong>Total:</strong></span>
+            <div style={{ width: '350px' }}>
+              {ancienSolde !== 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderTop: '1px solid #ddd' }}>
+                  <span><strong>Ancien solde:</strong></span>
+                  <span style={{ fontFamily: 'monospace', fontSize: '14pt', color: ancienSolde > 0 ? '#16a34a' : '#dc2626' }}>
+                    <strong>{formatCurrency(ancienSolde)}</strong>
+                  </span>
+                </div>
+              )}
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderTop: ancienSolde === 0 ? '1px solid #ddd' : 'none' }}>
+                <span><strong>Total facture:</strong></span>
                 <span style={{ fontFamily: 'monospace', fontSize: '14pt' }}><strong>{formatCurrency(transaction.total)}</strong></span>
               </div>
+              
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderTop: '1px solid #ddd', color: '#16a34a' }}>
-                <span><strong>Payé:</strong></span>
-                <span style={{ fontFamily: 'monospace', fontSize: '14pt' }}><strong>{formatCurrency(transaction.paid)}</strong></span>
+                <span><strong>Montant payé:</strong></span>
+                <span style={{ fontFamily: 'monospace', fontSize: '14pt' }}><strong>- {formatCurrency(transaction.paid)}</strong></span>
               </div>
+              
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '15px', borderTop: '2px solid #000', backgroundColor: '#fef3c7' }}>
                 <span style={{ fontSize: '14pt' }}><strong>Reste à payer:</strong></span>
-                <span style={{ fontFamily: 'monospace', fontSize: '16pt', color: '#dc2626' }}>
-                  <strong>{formatCurrency(transaction.total - transaction.paid)}</strong>
+                <span style={{ fontFamily: 'monospace', fontSize: '18pt', color: '#dc2626' }}>
+                  <strong>{formatCurrency(ancienSolde + transaction.total - transaction.paid)}</strong>
                 </span>
               </div>
             </div>

@@ -102,7 +102,7 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
       newErrors.partnerId = 'Sélectionnez un partner';
     }
 
-    if (formData.amount <= 0) {
+    if (formData.amount < 0) {
       newErrors.amount = 'Le montant doit être positif';
     }
 
