@@ -33,7 +33,7 @@ export const Payments: React.FC = () => {
   const { 
     payments, 
     loading, 
-    deletePayment,
+    createPayment,
     error 
   } = usePayments({
     partnerId: filters.partnerId
@@ -41,7 +41,6 @@ export const Payments: React.FC = () => {
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingPayment, setEditingPayment] = useState<Payment | null>(null);
-  const [deletingPayment, setDeletingPayment] = useState<Payment | null>(null);
 
   // Map partner names
   const partnerNames = partners.reduce((acc, p) => {
@@ -59,22 +58,11 @@ export const Payments: React.FC = () => {
   });
 
   const handleCreateSuccess = () => {
-    setShowCreateModal(false);
+      setShowCreateModal(false);
   };
 
   const handleEditSuccess = () => {
     setEditingPayment(null);
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!deletingPayment?.id) return;
-    
-    try {
-      await deletePayment(deletingPayment.id);
-      setDeletingPayment(null);
-    } catch (error) {
-      console.error('Delete error:', error);
-    }
   };
 
   const handleViewTransaction = (transactionId: number) => {
@@ -159,7 +147,6 @@ export const Payments: React.FC = () => {
           showPartnerName={true}
           partnerNames={partnerNames}
           onEditPayment={setEditingPayment}
-          onDeletePayment={setDeletingPayment}
           onViewTransaction={handleViewTransaction}
           emptyMessage={filters.search ? 'Aucun résultat' : 'Aucun paiement'}
         />
@@ -172,7 +159,7 @@ export const Payments: React.FC = () => {
         title="Nouveau paiement"
         size="md"
       >
-        <PaymentForm
+        <PaymentForm     
           onSuccess={handleCreateSuccess}
           onCancel={() => setShowCreateModal(false)}
         />
@@ -192,39 +179,6 @@ export const Payments: React.FC = () => {
             onCancel={() => setEditingPayment(null)}
           />
         )}
-      </Modal>
-
-      {/* Modal suppression */}
-      <Modal
-        isOpen={!!deletingPayment}
-        onClose={() => setDeletingPayment(null)}
-        title="Confirmer la suppression"
-        size="sm"
-      >
-        <Alert variant="warning">
-          Êtes-vous sûr de vouloir supprimer ce paiement de{' '}
-          <strong>
-            {deletingPayment && new Intl.NumberFormat('fr-FR').format(deletingPayment.amount)} F
-          </strong> ?
-          <br />
-          Cette action est irréversible.
-        </Alert>
-
-        <ModalFooter>
-          <Button
-            variant="secondary"
-            onClick={() => setDeletingPayment(null)}
-          >
-            Annuler
-          </Button>
-          <Button
-            variant="danger"
-            onClick={handleDeleteConfirm}
-            leftIcon={<Trash2 size={16} />}
-          >
-            Supprimer
-          </Button>
-        </ModalFooter>
       </Modal>
     </Layout>
   );
