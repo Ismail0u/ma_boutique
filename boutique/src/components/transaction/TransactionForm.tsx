@@ -8,10 +8,11 @@
  * - Validation complète
  */
 
-import React, { useState, useEffect } from 'react';
-import type { TransactionItem, Transaction, Direction } from '../../types/transaction';
-import { useTransactions, usePartnerBalance } from '../../hooks/useTransactions';
+import React, { useState, useEffect, useMemo } from 'react';
+import type { Transaction, TransactionItem, Direction } from '../../types/transaction';
+import { useTransactions } from '../../hooks/useTransactions';
 import { usePartners } from '../../hooks/usePartner';
+import { usePartnerBalance } from '../../hooks/useTransactions';
 import { useOCRUpload } from '../../hooks/useOCRUpload';
 import { Input, Select, Textarea } from '../Input';
 import { Button } from '../Buttons';
@@ -50,18 +51,16 @@ interface FormData {
 export const TransactionForm: React.FC<TransactionFormProps> = ({
   transaction,
   defaultPartnerId,
-  defaultDirection =
-  'SALE',
+  defaultDirection = 'SALE',
   onSuccess,
   onCancel
 }) => {
   const isEditMode = !!transaction;
   const canEdit = !transaction || (transaction && new Date(transaction.date).toDateString() === new Date().toDateString());
 
+  // 1. HOOKS EXTERNES D'ABORD
   const { createTransaction, updateTransaction, error: txError } = useTransactions();
   const { partners } = usePartners();
-  
-  // OCR hook
   const { 
     uploadAndProcess, 
     isProcessing: ocrProcessing,
@@ -72,7 +71,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
     error: ocrError
   } = useOCRUpload();
 
-  // État du formulaire
+  // 2. STATE LOCAL ENSUITE (AVANT toute utilisation)
   const [formData, setFormData] = useState<FormData>({
     partnerId: transaction?.partnerId ?? defaultPartnerId ?? null,
     date: transaction 
@@ -89,22 +88,29 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
 
   const [showOCRText, setShowOCRText] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string | undefined>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Balance du partner
+  // 3. COMPUTED VALUES (useMemo) - MAINTENANT formData existe
+  const selectedPartner = useMemo(
+    () => partners.find(p => p.id === formData.partnerId),
+    [partners, formData.partnerId]
+  );
+
+  // 4. BALANCE (après formData)
   const { balance: ancienSolde, loading: balanceLoading } = usePartnerBalance(
     formData.partnerId ?? undefined,
     new Date(formData.date).getTime()
   );
 
-  // Calcul position et nouveau solde
+  // 5. COMPUTED (après balance)
   const positionNew = formData.direction === 'SALE' 
     ? (formData.total - formData.paid)
     : -(formData.total - formData.paid);
   
   const nouveauSolde = ancienSolde + positionNew;
 
-  // Auto-remplissage depuis OCR
+  // 6. EFFECTS EN DERNIER
+  // Auto-remplissage OCR
   useEffect(() => {
     if (ocrResult && !isEditMode) {
       setFormData(prev => ({
@@ -128,7 +134,20 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
         setFormData(prev => ({ ...prev, total: calculatedTotal }));
       }
     }
-  }, [formData.items]);
+  }, [formData.items, formData.total]);
+
+  // Auto-type selon partner (AVEC GUARDS)
+  useEffect(() => {
+    if (selectedPartner && !isEditMode) {
+      const newDirection = selectedPartner.type === 'CLIENT' ? 'SALE' 
+        : selectedPartner.type === 'SUPPLIER' ? 'PURCHASE' 
+        : formData.direction;
+      
+      if (newDirection !== formData.direction) {
+        setFormData(prev => ({ ...prev, direction: newDirection }));
+      }
+    }
+  }, [selectedPartner?.id, selectedPartner?.type, isEditMode, formData.direction]);
 
   const handleImageSelect = async (file: File) => {
     try {
@@ -270,17 +289,37 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">Ancien solde</span>
-              <span className={`font-semibold ${ancienSolde >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              <span className={`font-semibold font-mono ${ancienSolde >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                 {balanceLoading ? '...' : formatCurrency(ancienSolde)}
               </span>
             </div>
 
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Position transaction</span>
-              <span className={`font-semibold ${positionNew >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {formatCurrency(positionNew)}
-              </span>
-            </div>
+            {formData.total > 0 && (
+              <>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Total transaction</span>
+                  <span className="font-bold font-mono text-gray-900">
+                    {formatCurrency(formData.total)}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Montant payé</span>
+                  <span className="font-semibold font-mono text-green-600">
+                    {formatCurrency(formData.paid)}
+                  </span>
+                </div>
+
+                <div className="h-px bg-gray-200" />
+
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Position transaction</span>
+                  <span className={`font-semibold font-mono ${positionNew >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {formatCurrency(positionNew)}
+                  </span>
+                </div>
+              </>
+            )}
 
             <div className="h-px bg-gray-200" />
 
@@ -289,7 +328,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
                 {nouveauSolde >= 0 ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
                 <span className="font-semibold">Nouveau solde</span>
               </div>
-              <span className={`text-2xl font-bold ${nouveauSolde >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              <span className={`text-2xl font-bold font-mono ${nouveauSolde >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                 {formatCurrency(nouveauSolde)}
               </span>
             </div>
@@ -323,13 +362,18 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
         disabled={!canEdit || isSubmitting}
       />
 
-      {/* Direction */}
+      {/* Direction - Désactivé si type partner clair */}
       <Select
         label="Type de transaction *"
         value={formData.direction}
         onChange={(e) => handleChange('direction', e.target.value as Direction)}
         options={directionOptions}
-        disabled={!canEdit || isSubmitting}
+        disabled={!canEdit || isSubmitting || (selectedPartner && selectedPartner.type !== 'BOTH')}
+        helperText={
+          selectedPartner && selectedPartner.type !== 'BOTH'
+            ? `Type auto: ${selectedPartner.type === 'CLIENT' ? 'Vente' : 'Achat'}`
+            : undefined
+        }
       />
 
       {/* Photo + OCR */}
