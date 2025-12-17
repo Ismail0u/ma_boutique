@@ -6,7 +6,7 @@
 import React from 'react';
 import { Button } from './Buttons';
 import { Card } from './Card';
-import { Download, X, Smartphone } from 'lucide-react';
+import { Download, X } from 'lucide-react';
 
 interface InstallPromptProps {
   onInstall: () => void;
@@ -22,8 +22,8 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
       <Card variant="elevated" padding="md" className="bg-linear-to-r from-blue-600 to-blue-700 text-white">
         <div className="flex items-start gap-4">
           {/* Icon */}
-          <div className="shrink-0 w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-            <Smartphone size={24} />
+          <div className="shrink-0 w-20 h-20 bg-opacity-20 rounded-full flex items-center justify-center">
+            <img src="../logo.svg" />
           </div>
 
           {/* Content */}
@@ -120,10 +120,10 @@ export const UpdatePrompt: React.FC<UpdatePromptProps> = ({
  */
 export const OfflineIndicator: React.FC = () => {
   return (
-    <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
-      <div className="bg-yellow-500 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2">
+    <div className="fixed top-10 left-1/2 transform -translate-x-1/2 z-50">
+      <div className="bg-yellow-500 text-white px-3 py-2 rounded-full shadow-lg flex items-center gap-2">
         <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-        <span className="text-sm font-medium">Mode hors ligne</span>
+        <span className="text-xs font-medium">Mode hors ligne</span>
       </div>
     </div>
   );
