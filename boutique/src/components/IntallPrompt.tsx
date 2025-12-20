@@ -1,12 +1,16 @@
 /**
- * InstallPrompt - Banner d'installation PWA
- * S'affiche automatiquement quand l'app est installable
+ * InstallPrompt - Banner d'installation PWA AVEC VERCEL ANALYTICS
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from './Buttons';
 import { Card } from './Card';
 import { Download, X } from 'lucide-react';
+import { 
+  trackInstallPromptShown, 
+  trackInstallPromptDismissed, 
+  trackPWAInstall 
+} from '../utils/vercelAnalytics';
 
 interface InstallPromptProps {
   onInstall: () => void;
@@ -17,13 +21,28 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
   onInstall,
   onDismiss
 }) => {
+  // Track quand le prompt s'affiche
+  useEffect(() => {
+    trackInstallPromptShown();
+  }, []);
+
+  const handleInstall = () => {
+    trackPWAInstall(); //  Track installation
+    onInstall();
+  };
+
+  const handleDismiss = () => {
+    trackInstallPromptDismissed(); //  Track rejet
+    onDismiss();
+  };
+
   return (
     <div className="fixed bottom-20 left-4 right-4 z-50 animate-fadeIn">
-      <Card variant="elevated" padding="md" className="bg-linear-to-r from-blue-600 to-blue-700 text-white">
+      <Card variant="elevated" padding="md" className="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
         <div className="flex items-start gap-4">
           {/* Icon */}
-          <div className="shrink-0 w-20 h-20 bg-opacity-20 rounded-full flex items-center justify-center">
-            <img src="../logo.svg" />
+          <div className="shrink-0 w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+            <img src="/logo.svg" alt="Logo" className="w-12 h-12" />
           </div>
 
           {/* Content */}
@@ -39,17 +58,17 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
             <div className="flex gap-2">
               <Button
                 size="sm"
-                onClick={onInstall}
+                onClick={handleInstall}
                 leftIcon={<Download size={16} />}
-                className="hover:bg-blue-50"
+                className="bg-white text-blue-600 hover:bg-blue-50"
               >
                 Installer
               </Button>
               <Button
                 size="sm"
                 variant="ghost"
-                onClick={onDismiss}
-                className="text-white hover:bg-white hover:text-blue-600 hover:bg-opacity-10"
+                onClick={handleDismiss}
+                className="text-white hover:bg-white hover:bg-opacity-10"
               >
                 Plus tard
               </Button>
@@ -58,8 +77,8 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
 
           {/* Close button */}
           <button
-            onClick={onDismiss}
-            className="flex shrink-0 text-white hover:bg-white hover:bg-opacity-20 rounded-lg p-1 transition-colors"
+            onClick={handleDismiss}
+            className="shrink-0 text-white hover:bg-white hover:bg-opacity-20 rounded-lg p-1 transition-colors"
             aria-label="Fermer"
           >
             <X size={20} />

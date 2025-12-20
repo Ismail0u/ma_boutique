@@ -38,7 +38,6 @@ export function usePWA(): UsePWAReturn {
 
     // Listen for successful installation
     const handleAppInstalled = () => {
-      console.log('[PWA] App installed');
       setIsInstalled(true);
       setIsInstallable(false);
       setDeferredPrompt(null);
