@@ -58,7 +58,7 @@ function App() {
   };
 
   return (
-    <BrowserRouter>
+    <>
       {/* Offline indicator */}
       {isOffline && <OfflineIndicator />}
 
@@ -102,7 +102,7 @@ function App() {
         {/* 404 - Redirect to home */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </BrowserRouter>
+    </>
   );
 }
 
