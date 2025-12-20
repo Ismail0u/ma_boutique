@@ -1,21 +1,23 @@
 /**
- * PaymentForm - Formulaire d'enregistrement de paiement
- * Features:
- * - Paiement lié à une transaction ou standalone
- * - Affichage reste à payer
- * - Validation montant
+ * PaymentForm - VERSION FINALE CORRIGÉE
+ * 
+ * CHANGEMENTS :
+ * - Import previewBalanceAfterPayment() depuis balance.ts
+ * - Enregistre Payment STANDALONE (transactionId = undefined)
+ * - Fix className "bg-linear-to-br" → "bg-gradient-to-br"
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import type { Payment } from '../../types/payments';
 import { usePayments } from '../../hooks/usePayments';
 import { usePartners } from '../../hooks/usePartner';
 import { usePartnerBalance } from '../../hooks/useTransactions';
+import { previewBalanceAfterPayment } from '../../utils/balance';
 import { Input, Textarea } from '../Input';
 import { Button } from '../Buttons';
 import { Alert } from '../Alert';
 import { Card } from '../Card';
-import { Calendar, Search } from 'lucide-react';
+import { Calendar, Search, DollarSign } from 'lucide-react';
 
 interface PaymentFormProps {
   payment?: Payment;
@@ -38,9 +40,12 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
   onCancel
 }) => {
   const isEditMode = !!payment;
+  
+  // HOOKS
   const { createPayment, updatePayment, error: paymentError } = usePayments();
   const { partners } = usePartners();
 
+  // STATE
   const [formData, setFormData] = useState<FormData>({
     partnerId: payment?.partnerId ?? defaultPartnerId ?? null,
     date: payment 
@@ -52,74 +57,99 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
 
   const [partnerSearch, setPartnerSearch] = useState('');
   const [showPartnerDropdown, setShowPartnerDropdown] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string | undefined>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const hasInitializedSearch = useRef(false);
 
-  // Balance du partner
+  // ✅ CORRIGÉ : N'appelle usePartnerBalance QUE si partnerId existe
+  const shouldFetchBalance = formData.partnerId !== null;
   const { balance: partnerBalance, loading: balanceLoading } = usePartnerBalance(
-    formData.partnerId ?? undefined
+    shouldFetchBalance ? (formData.partnerId ?? undefined) : undefined
   );
 
-  // Filtrer partners par recherche
-  const filteredPartners = partners.filter(p =>
-    p.name.toLowerCase().includes(partnerSearch.toLowerCase()) ||
-    p.phone?.toLowerCase().includes(partnerSearch.toLowerCase())
+  // COMPUTED
+  const selectedPartner = useMemo(
+    () => partners.find(p => p.id === formData.partnerId),
+    [partners, formData.partnerId]
   );
 
-  // Nom du partner sélectionné
-  const selectedPartner = partners.find(p => p.id === formData.partnerId);
+  const filteredPartners = useMemo(
+    () => partners.filter(p =>
+      p.name.toLowerCase().includes(partnerSearch.toLowerCase()) ||
+      p.phone?.toLowerCase().includes(partnerSearch.toLowerCase())
+    ),
+    [partners, partnerSearch]
+  );
 
-  // Init search avec partner name
-  useEffect(() => {
-    if (selectedPartner) {
-      setPartnerSearch(selectedPartner.name);
+  // ✅ CORRIGÉ : Utilise la fonction utilitaire SEULEMENT si partnerId existe
+  const nouvelleBalance = useMemo(() => {
+    if (!formData.partnerId || balanceLoading || formData.amount <= 0) {
+      return 0; // ← Retourne 0 au lieu de partnerBalance
     }
-  }, [selectedPartner]);
+    return previewBalanceAfterPayment(partnerBalance, formData.amount);
+  }, [partnerBalance, balanceLoading, formData.amount, formData.partnerId]);
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'decimal',
-      minimumFractionDigits: 0
-    }).format(Math.abs(amount)) + ' F';
-  };
+  // EFFECTS
+  // ✅ CORRIGÉ : N'initialise partnerSearch QUE si on édite un payment existant
+  useEffect(() => {
+    if (payment && selectedPartner?.name && !hasInitializedSearch.current) {
+      setPartnerSearch(selectedPartner.name);
+      hasInitializedSearch.current = true;
+    }
+  }, [payment, selectedPartner?.id, selectedPartner?.name]);
 
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.partner-search-container')) {
+        setShowPartnerDropdown(false);
+      }
+    };
+
+    if (showPartnerDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showPartnerDropdown]);
+
+  // HANDLERS
   const handleChange = (field: keyof FormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    setErrors(prev => ({ ...prev, [field]: undefined }));
+    if (errors[field]) {
+      const newErrors = { ...errors };
+      delete newErrors[field];
+      setErrors(newErrors);
+    }
   };
 
   const handlePartnerSelect = (partnerId: number, partnerName: string) => {
     setFormData(prev => ({ ...prev, partnerId }));
     setPartnerSearch(partnerName);
     setShowPartnerDropdown(false);
-    setErrors(prev => ({ ...prev, partnerId: undefined }));
+    if (errors.partnerId) {
+      const newErrors = { ...errors };
+      delete newErrors.partnerId;
+      setErrors(newErrors);
+    }
   };
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
-
-    if (!formData.partnerId) {
-      newErrors.partnerId = 'Sélectionnez un partner';
-    }
-
-    if (formData.amount < 0) {
-      newErrors.amount = 'Le montant doit être positif';
-    }
-
+    if (!formData.partnerId) newErrors.partnerId = 'Sélectionnez un partner';
+    if (formData.amount <= 0) newErrors.amount = 'Le montant doit être positif';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!validateForm()) return;
 
     setIsSubmitting(true);
-
     try {
       const paymentData = {
         partnerId: formData.partnerId!,
+        // ✅ PAS de transactionId = paiement standalone
         date: new Date(formData.date).getTime(),
         amount: formData.amount,
         note: formData.note.trim() || undefined
@@ -139,7 +169,8 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
           note: ''
         });
         setPartnerSearch('');
-
+        hasInitializedSearch.current = false;
+        
         onSuccess?.({ id, ...paymentData, createdAt: Date.now() }, true);
       }
     } catch (error) {
@@ -149,34 +180,44 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
     }
   };
 
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('fr-FR', {
+      style: 'decimal',
+      minimumFractionDigits: 0
+    }).format(Math.abs(amount)) + ' F';
+  };
+
+  const getBalanceLabel = (balance: number): string => {
+    if (balance > 0) return 'Le partner vous doit';
+    if (balance < 0) return 'Vous devez au partner';
+    return 'Compte soldé';
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Erreurs */}
       {paymentError && <Alert variant="danger">{paymentError}</Alert>}
 
-      {/* Info balance partner */}
+      {/* Balance actuelle */}
       {formData.partnerId && !balanceLoading && (
-        <Card variant="elevated" padding="md" className="bg-blue-50">
+        <Card variant="elevated" padding="md" className="bg-gradient-to-br from-blue-50 to-indigo-50">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-700">
-              Balance actuelle du partner
-            </span>
-            <span className={`text-lg font-bold font-mono ${partnerBalance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            <div>
+              <span className="text-sm font-medium text-gray-600">
+                Balance actuelle
+              </span>
+              <p className="text-xs text-gray-500 mt-0.5">
+                {getBalanceLabel(partnerBalance)}
+              </p>
+            </div>
+            <span className={`text-2xl font-bold font-mono ${partnerBalance >= 0 ? 'text-orange-600' : 'text-red-600'}`}>
               {formatCurrency(partnerBalance)}
             </span>
           </div>
-          <p className="text-xs text-gray-600 mt-1">
-            {partnerBalance > 0 
-              ? 'Le partner vous doit' 
-              : partnerBalance < 0 
-              ? 'Vous devez au partner'
-              : 'Compte soldé'}
-          </p>
         </Card>
       )}
 
-      {/* Partner - Auto-suggest search */}
-      <div>
+      {/* Partner search */}
+      <div className="partner-search-container">
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Partner *
         </label>
@@ -194,7 +235,6 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
             leftIcon={<Search size={18} />}
           />
           
-          {/* Dropdown suggestions */}
           {showPartnerDropdown && !defaultPartnerId && filteredPartners.length > 0 && (
             <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
               {filteredPartners.map((partner) => (
@@ -232,10 +272,10 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
         leftIcon={<Calendar size={18} />}
       />
 
-      {/* Montant - Style monétaire */}
+      {/* Montant */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Montant *
+          Montant du paiement *
         </label>
         <div className="relative">
           <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-semibold">
@@ -276,16 +316,69 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
         disabled={isSubmitting}
       />
 
-      {/* Aperçu nouvelle balance */}
-      {formData.partnerId && formData.amount > 0 && (
-        <Card padding="md" className="bg-green-50">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-700">
-              Nouvelle balance après paiement
-            </span>
-            <span className="text-lg font-bold text-green-600 font-mono">
-              {formatCurrency(partnerBalance - formData.amount)}
-            </span>
+      {/* Preview nouvelle balance */}
+      {formData.partnerId && formData.amount > 0 && !balanceLoading && (
+        <Card padding="md" className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-300">
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 mb-2">
+              <DollarSign size={18} className="text-green-600" />
+              <span className="text-sm font-semibold text-gray-700">Aperçu après paiement</span>
+            </div>
+
+            <div className="bg-white rounded-lg p-3 space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-600">Balance actuelle</span>
+                <span className={`font-bold font-mono ${partnerBalance >= 0 ? 'text-orange-600' : 'text-red-600'}`}>
+                  {formatCurrency(partnerBalance)}
+                </span>
+              </div>
+              
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-600">
+                  {partnerBalance >= 0 ? 'Vous recevez' : 'Vous payez'}
+                </span>
+                <span className="font-semibold font-mono text-green-600">
+                  {partnerBalance >= 0 ? '- ' : '+ '}{formatCurrency(formData.amount)}
+                </span>
+              </div>
+              
+              <div className="h-px bg-gray-200 my-2" />
+              
+              <div className="flex items-center justify-between pt-1">
+                <span className="font-bold text-gray-900">
+                  Nouvelle balance
+                </span>
+                <span className={`text-xl font-bold font-mono ${nouvelleBalance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {formatCurrency(nouvelleBalance)}
+                </span>
+              </div>
+            </div>
+
+            {/* Messages contextuels */}
+            {nouvelleBalance === 0 && (
+              <div className="mt-2 p-3 bg-green-100 rounded-lg text-center border border-green-300">
+                <span className="text-sm font-bold text-green-700">
+                  ✓ Compte soldé !
+                </span>
+              </div>
+            )}
+
+            {Math.abs(nouvelleBalance) < Math.abs(partnerBalance) && nouvelleBalance !== 0 && (
+              <div className="mt-2 p-3 bg-blue-100 rounded-lg text-center border border-blue-300">
+                <span className="text-sm font-semibold text-blue-700">
+                  ✓ Dette réduite de {formatCurrency(Math.abs(partnerBalance - nouvelleBalance))}
+                </span>
+              </div>
+            )}
+
+            {/* Alerte paiement excédentaire */}
+            {((partnerBalance >= 0 && nouvelleBalance < 0) || (partnerBalance < 0 && nouvelleBalance > 0)) && (
+              <div className="mt-2 p-3 bg-yellow-100 rounded-lg text-center border border-yellow-300">
+                <span className="text-sm font-semibold text-yellow-700">
+                  ⚠ Paiement excédentaire - Inversera la dette
+                </span>
+              </div>
+            )}
           </div>
         </Card>
       )}
