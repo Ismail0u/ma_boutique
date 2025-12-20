@@ -88,7 +88,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
 
   const [showOCRText, setShowOCRText] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Record<string, string | undefined>>({});
 
   // 3. COMPUTED VALUES (useMemo) - MAINTENANT formData existe
   const selectedPartner = useMemo(
