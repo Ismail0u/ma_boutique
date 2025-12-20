@@ -97,17 +97,16 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
   );
 
   // 4. BALANCE (après formData)
-  const { balance: ancienSolde, loading: balanceLoading } = usePartnerBalance(
-    formData.partnerId ?? undefined,
-    new Date(formData.date).getTime()
-  );
+    const { balance: partnerBalance, loading: balanceLoading } = usePartnerBalance(
+      formData.partnerId ?? undefined,
+    );
 
   // 5. COMPUTED (après balance)
   const positionNew = formData.direction === 'SALE' 
     ? (formData.total - formData.paid)
     : -(formData.total - formData.paid);
   
-  const nouveauSolde = ancienSolde + positionNew;
+  const nouveauSolde = partnerBalance + positionNew;
 
   // 6. EFFECTS EN DERNIER
   // Auto-remplissage OCR
@@ -289,8 +288,8 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">Ancien solde</span>
-              <span className={`font-semibold font-mono ${ancienSolde >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {balanceLoading ? '...' : formatCurrency(ancienSolde)}
+              <span className={`font-semibold font-mono ${partnerBalance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {balanceLoading ? '...' : formatCurrency(partnerBalance)}
               </span>
             </div>
 
