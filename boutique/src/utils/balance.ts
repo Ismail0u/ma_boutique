@@ -82,8 +82,18 @@ export async function getPreviousBalance(
     .filter(p => !p.transactionId && p.date < beforeDate)
     .toArray();
 
-  // Les paiements réduisent TOUJOURS la balance (vers 0)
-  balance -= standalonePayments.reduce((sum, p) => sum + p.amount, 0);
+  // ✅ CORRIGÉ : Les paiements réduisent TOUJOURS la valeur absolue (vers 0)
+  // Si balance > 0 (client nous doit) : on reçoit le paiement → balance diminue
+  // Si balance < 0 (on doit au fournisseur) : on paie → balance augmente (vers 0)
+  const totalPayments = standalonePayments.reduce((sum, p) => sum + p.amount, 0);
+  
+  if (balance >= 0) {
+    // CLIENT nous doit : paiement RÉDUIT la créance
+    balance -= totalPayments;
+  } else {
+    // FOURNISSEUR on lui doit : paiement RÉDUIT la dette (augmente balance vers 0)
+    balance += totalPayments;
+  }
 
   return balance;
 }
