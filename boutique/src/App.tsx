@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { usePWA, useServiceWorker } from './hooks/usePWA';
 import { InstallPrompt, UpdatePrompt, OfflineIndicator } from './components/IntallPrompt';
 
