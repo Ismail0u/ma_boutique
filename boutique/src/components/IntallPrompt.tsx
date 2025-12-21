@@ -41,7 +41,7 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
       <Card variant="elevated" padding="md" className="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
         <div className="flex items-start gap-4">
           {/* Icon */}
-          <div className="shrink-0 w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+          <div className="shrink-0 w-20 h-20 bg-opacity-20 rounded-full flex items-center justify-center">
             <img src="/logo.svg" alt="Logo" className="w-12 h-12" />
           </div>
 
@@ -60,7 +60,7 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
                 size="sm"
                 onClick={handleInstall}
                 leftIcon={<Download size={16} />}
-                className="bg-white text-blue-600 hover:bg-blue-50"
+                className="text-blue-600 bg-blue-100 border-2 border-b-blue-50 hover:bg-blue-50"
               >
                 Installer
               </Button>
@@ -68,7 +68,7 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
                 size="sm"
                 variant="ghost"
                 onClick={handleDismiss}
-                className="text-white hover:bg-white hover:bg-opacity-10"
+                className="text-white hover:bg-gray-100 hover:text-blue-700"
               >
                 Plus tard
               </Button>
