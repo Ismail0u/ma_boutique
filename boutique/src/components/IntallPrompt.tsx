@@ -78,7 +78,7 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
           {/* Close button */}
           <button
             onClick={handleDismiss}
-            className="shrink-0 text-white hover:bg-white hover:bg-opacity-20 rounded-lg p-1 transition-colors"
+            className="shrink-0 text-white hover:bg-blue-50 hover:text-blue-700 hover:bg-opacity-20 rounded-lg p-1 transition-colors"
             aria-label="Fermer"
           >
             <X size={20} />
