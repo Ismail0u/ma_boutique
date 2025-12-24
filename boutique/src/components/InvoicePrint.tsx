@@ -41,7 +41,7 @@ export const InvoicePrint: React.FC<InvoicePrintProps> = ({
     return new Intl.NumberFormat('fr-FR', {
       style: 'decimal',
       minimumFractionDigits: 0
-    }).format(amount) + ' F CFA';
+    }).format(amount) + ' FCFA';
   };
 
   const formatDate = (timestamp: number) => {
@@ -113,7 +113,7 @@ export const InvoicePrint: React.FC<InvoicePrintProps> = ({
 
           {/* Info client */}
           <div style={{ marginBottom: '30px', padding: '15px', backgroundColor: '#f5f5f5', borderRadius: '5px' }}>
-            <h3 style={{ fontSize: '14pt', fontWeight: 'bold', margin: '0 0 10px 0' }}>
+            <h3 style={{ fontSize: '13pt', fontWeight: 'bold', margin: '0 0 10px 0' }}>
               Facturé à:
             </h3>
             <p style={{ margin: '5px 0', fontSize: '13pt' }}><strong>{partner.name}</strong></p>
@@ -137,12 +137,12 @@ export const InvoicePrint: React.FC<InvoicePrintProps> = ({
               <tbody>
                 {transaction.items.map((item, index) => (
                   <tr key={index} style={{ borderBottom: '1px solid #ddd' }}>
-                    <td style={{ padding: '10px', border: '1px solid #ddd' }}>{item.name}</td>
-                    <td style={{ padding: '10px', textAlign: 'center', border: '1px solid #ddd' }}>{item.qty}</td>
-                    <td style={{ padding: '10px', textAlign: 'right', border: '1px solid #ddd', fontFamily: 'monospace' }}>
+                    <td style={{ padding: '5px', border: '1px solid #ddd' }}>{item.name}</td>
+                    <td style={{ padding: '5px', textAlign: 'center', border: '1px solid #ddd' }}>{item.qty}</td>
+                    <td style={{ padding: '5px', textAlign: 'right', border: '1px solid #ddd', fontFamily: 'monospace' }}>
                       {formatCurrency(item.price)}
                     </td>
-                    <td style={{ padding: '10px', textAlign: 'right', border: '1px solid #ddd', fontFamily: 'monospace', fontWeight: 'bold' }}>
+                    <td style={{ padding: '5px', textAlign: 'right', border: '1px solid #ddd', fontFamily: 'monospace', fontWeight: 'bold' }}>
                       {formatCurrency(item.qty * item.price)}
                     </td>
                   </tr>
