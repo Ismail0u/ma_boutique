@@ -74,7 +74,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-60 flex items-center justify-center bg-black bg-opacity-50 p-4 pb-20"
+      className="fixed inset-0 z-60 flex items-center justify-center bg-white opacity-95 p-4 pb-20"
       onClick={handleBackdropClick}
     >
       <div

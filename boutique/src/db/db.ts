@@ -9,11 +9,13 @@ import type { Table } from 'dexie';
 import type { Partner } from '../types/partners';
 import type { Transaction } from '../types/transaction';
 import type { Payment } from '../types/payments';
+import type { Setting } from '../types/settings';
 
 class BoutiqueDB extends Dexie {
   partners!: Table<Partner, number>;
   transactions!: Table<Transaction, number>;
   payments!: Table<Payment, number>;
+  settings!: Table<Setting>;
 
   constructor() {
     super('boutiqueDB');
@@ -31,6 +33,19 @@ class BoutiqueDB extends Dexie {
       payments: '++id, partnerId, transactionId, date, [partnerId+date]'
     });
 
+    this.version(2).stores({
+      // Partners: unique constraint sur [name+type]
+      // Index sur phone pour recherche rapide
+      partners: '++id, &[name+type], type, phone, createdAt',
+      
+      // Transactions: index optimisés pour queries fréquentes
+      // partnerId + date pour calcul balance
+      transactions: '++id, partnerId, date, direction, [partnerId+date]',
+      
+      // Payments: index pour retrouver paiements par partner/transaction
+      payments: '++id, partnerId, transactionId, date, [partnerId+date]',
+      settings: 'key, updatedAt' // pour settings
+    });
     // Hooks pour timestamps automatiques
     // Exemple pour partners (idem pour transactions/payments)
     this.partners.hook('creating', (_primKey, obj) => {
