@@ -16,6 +16,11 @@ import { PartnerDetailPage } from './pages/PartnerDetailPage';
 import { Transactions } from './pages/Transactions';
 import { NewTransaction } from './pages/NewTransaction';
 import { Payments } from './pages/Payments';
+import { HelpCenter } from './pages/HelperCenter';
+
+// Onboarding
+import { OnboardingTour} from './components/onboarding/OnboardingTour';
+import { useOnboarding } from './hooks/useOnboarding';
 
 function App() {
   const { isInstallable, isOffline, promptInstall, cancelInstall } = usePWA();
@@ -23,6 +28,8 @@ function App() {
   
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
   const [showUpdatePrompt, setShowUpdatePrompt] = useState(false);
+
+  const { shouldShowOnboarding, isLoading: onboardingLoading, hideOnboarding } = useOnboarding();
 
   // Show install prompt after 30 seconds if installable
   useEffect(() => {
@@ -99,9 +106,17 @@ function App() {
         {/* Payments */}
         <Route path="/payments" element={<Payments />} />
 
+        <Route path="/help" element={<HelpCenter />} />
+
         {/* 404 - Redirect to home */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+
+      <OnboardingTour
+        isOpen={shouldShowOnboarding}
+        onComplete={hideOnboarding}
+        onSkip={hideOnboarding}
+      />
     </>
   );
 }

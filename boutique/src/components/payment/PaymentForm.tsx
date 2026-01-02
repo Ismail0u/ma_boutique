@@ -61,7 +61,7 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const hasInitializedSearch = useRef(false);
 
-  // ✅ CORRIGÉ : N'appelle usePartnerBalance QUE si partnerId existe
+  // N'appelle usePartnerBalance QUE si partnerId existe
   const shouldFetchBalance = formData.partnerId !== null;
   const { balance: partnerBalance, loading: balanceLoading } = usePartnerBalance(
     shouldFetchBalance ? (formData.partnerId ?? undefined) : undefined
